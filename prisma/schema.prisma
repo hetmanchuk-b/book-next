@@ -1,0 +1,102 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  USER
+  MASTER
+}
+
+enum ScheduleStatus {
+  FREE
+  BOOKED
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
+model Contact {
+  id     String @id @default(uuid())
+  name   String
+  value  String
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
+}
+
+model User {
+  id             String  @id @default(uuid())
+  email          String  @unique
+  name           String?
+  hashedPassword String
+
+  posts Post[]
+
+  role     UserRole  @default(USER)
+  contact  Contact[]
+  master   Master?
+  bookings Booking[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Master {
+  id         String  @id @default(uuid())
+  userId     String  @unique
+  user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  profession String?
+  bio        String?
+
+  schedules Schedule[]
+  bookings  Booking[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Schedule {
+  id        String         @id @default(uuid())
+  masterId  String
+  master    Master         @relation(fields: [masterId], references: [id], onDelete: Cascade)
+  startTime DateTime
+  endTime   DateTime
+  status    ScheduleStatus @default(FREE)
+  booking   Booking?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Booking {
+  id         String         @id @default(uuid())
+  userId     String
+  user       User           @relation(fields: [userId], references: [id])
+  scheduleId String         @unique
+  schedule   Schedule       @relation(fields: [scheduleId], references: [id])
+  masterId   String
+  master     Master         @relation(fields: [masterId], references: [id], onDelete: Cascade)
+  status     BookingStatus? @default(PENDING)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Post {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  title     String
+  content   String?
+  published Boolean  @default(false)
+  authorId  String?
+  author    User?    @relation(fields: [authorId], references: [id])
+}
