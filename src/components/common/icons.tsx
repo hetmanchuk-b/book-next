@@ -8,6 +8,7 @@ import {
   CalendarCheck2,
   FolderCog,
   User,
+  House,
   type LucideIcon,
   type LucideProps,
 } from 'lucide-react';
@@ -24,6 +25,7 @@ export const Icons = {
   schedule: CalendarCheck2,
   booking: FolderCog,
   user: User,
+  home: House,
   google: ({ ...props }: LucideProps) => (
     <svg
       aria-hidden="true"

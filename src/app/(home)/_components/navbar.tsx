@@ -16,10 +16,10 @@ export const Navbar = async () => {
   }
 
   return (
-    <div className="pl-6 h-20 flex border-b justify-between font-medium bg-white">
+    <div className="pl-3 sm:pl-6 h-20 flex border-b justify-between font-medium bg-white">
       <Logo />
 
-      <div className="flex items-center pr-6 gap-4">
+      <div className="flex items-center pr-3 sm:pr-6 gap-4">
         {user ? (
           <div className="flex items-center gap-4">
             <div className="text-sm text-gray-500">
