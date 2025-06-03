@@ -2,6 +2,12 @@ import {
   Check,
   MenuIcon,
   LoaderCircle,
+  Plus,
+  Trash2,
+  Settings,
+  CalendarCheck2,
+  FolderCog,
+  User,
   type LucideIcon,
   type LucideProps,
 } from 'lucide-react';
@@ -12,6 +18,12 @@ export const Icons = {
   check: Check,
   menu: MenuIcon,
   loader: LoaderCircle,
+  add: Plus,
+  remove: Trash2,
+  settings: Settings,
+  schedule: CalendarCheck2,
+  booking: FolderCog,
+  user: User,
   google: ({ ...props }: LucideProps) => (
     <svg
       aria-hidden="true"

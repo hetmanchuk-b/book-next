@@ -1,5 +1,6 @@
 import NextAuth from "next-auth";
 import {authOptions} from "@/auth";
+import {UserRole} from "@prisma/client";
 
 const handler = NextAuth(authOptions);
 
@@ -11,6 +12,7 @@ declare module 'next-auth' {
       id: string;
       name: string;
       email: string;
+      role: UserRole;
     }
   }
 }

@@ -28,7 +28,7 @@ model Contact {
   id     String @id @default(uuid())
   name   String
   value  String
-  userId String @unique
+  userId String
   user   User   @relation(fields: [userId], references: [id])
 }
 
