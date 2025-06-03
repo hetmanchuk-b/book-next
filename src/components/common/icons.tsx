@@ -9,11 +9,16 @@ import {
   FolderCog,
   User,
   House,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  Calendar,
+  X,
   type LucideIcon,
   type LucideProps,
 } from 'lucide-react';
 
-export type Icon = LucideIcon;
+export type IconProps = LucideIcon;
 
 export const Icons = {
   check: Check,
@@ -26,6 +31,11 @@ export const Icons = {
   booking: FolderCog,
   user: User,
   home: House,
+  chevronLeft: ChevronLeft,
+  chevronRight: ChevronRight,
+  clock: Clock,
+  calendar: Calendar,
+  x: X,
   google: ({ ...props }: LucideProps) => (
     <svg
       aria-hidden="true"

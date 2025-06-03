@@ -1,8 +1,4 @@
 import {Logo} from "@/components/common/logo";
-import Link from "next/link";
-import {buttonVariants} from "@/components/ui/button";
-import {cn} from "@/lib/utils";
-import {SignOutButton} from "@/app/(home)/_components/sign-out-button";
 import {getServerSession} from "next-auth";
 import {authOptions} from "@/auth";
 import {getUser} from "@/actions/user-actions";
@@ -24,7 +20,7 @@ export const Navbar = async () => {
 
       <div className="flex items-center pr-3 sm:pr-6 gap-4">
 
-        <CabinetMenu name={user?.name || 'Guest'} />
+        <CabinetMenu name={user?.name || 'Unknown'} />
       </div>
     </div>
   );
