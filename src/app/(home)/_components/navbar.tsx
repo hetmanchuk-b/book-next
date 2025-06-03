@@ -13,8 +13,6 @@ export const Navbar = () => {
       <Logo />
 
       <div className="flex items-center pr-6 gap-4">
-        <Link href="/test">Test link</Link>
-
         {session ? (
           <div className="flex items-center gap-4">
             <div className="text-sm text-gray-500">
