@@ -71,6 +71,7 @@ model Schedule {
   endTime   DateTime
   status    ScheduleStatus @default(FREE)
   booking   Booking?
+  bookingId String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
