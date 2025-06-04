@@ -9,11 +9,13 @@ import {formatDate} from "@/lib/calendar-utils";
 interface BrutCalendarWeekNavProps extends ComponentPropsWithoutRef<'div'> {
   onNavigateWeek: (val: -1 | 1) => void;
   weekDates: Date[];
+  isPrevDisabled: boolean;
 }
 
 export const BrutCalendarWeekNav = (
   {
     onNavigateWeek,
+    isPrevDisabled,
     weekDates,
     className,
     ...props
@@ -29,6 +31,7 @@ export const BrutCalendarWeekNav = (
     >
       <Button
         onClick={() => onNavigateWeek(-1)}
+        disabled={isPrevDisabled}
         type="button"
         variant='elevated'
         size='icon'

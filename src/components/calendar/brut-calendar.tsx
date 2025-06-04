@@ -1,20 +1,21 @@
 "use client";
 
+import {toast} from "sonner";
+import {ScheduleStatus} from "@prisma/client";
+import {useState} from "react";
+import {TimeSlot} from "@/lib/calendar-utils";
+import {ScrollArea, ScrollBar} from "@/components/ui/scroll-area";
 import {BrutCalendarHeader} from "@/components/calendar/brut-calendar-header";
 import {BrutCalendarDurationsControls} from "@/components/calendar/brut-calendar-durations-controls";
-import {useState} from "react";
 import {BrutCalendarWeekNav} from "@/components/calendar/brut-calendar-week-nav";
-import {TimeSlot} from "@/lib/calendar-utils";
 import {BrutCalendarGrid} from "@/components/calendar/brut-calendar-grid";
-import {ScrollArea, ScrollBar} from "@/components/ui/scroll-area";
-import {ScheduleStatus} from "@prisma/client";
 import {BrunCalendarSummary} from "@/components/calendar/brun-calendar-summary";
-import {toast} from "sonner";
 
 export const BrutCalendar = () => {
   const [selectedInterval, setSelectedInterval] = useState(1);
   const [customDuration, setCustomDuration] = useState<number | ''>('');
   const [selectedSlots, setSelectedSlots] = useState<TimeSlot[]>([]);
+  const [isAbleToShowPrevWeek, setIsAbleToShowPrevWeek] = useState(false);
   const [currentWeekStart, setCurrentWeekStart] = useState(() => {
     const today = new Date();
     const dayOfWeek = today.getDay();
@@ -24,6 +25,13 @@ export const BrutCalendar = () => {
     monday.setHours(0, 0, 0, 0);
     return monday;
   });
+
+  const getPrevWeekStart = () => {
+    const prevMonday = new Date();
+    prevMonday.setDate(prevMonday.getDate() - (prevMonday.getDay() + 6) % 7);
+    prevMonday.setHours(0, 0, 0, 0);
+    return prevMonday;
+  }
 
   const getWeekDates = () => {
     const dates = []
@@ -40,7 +48,14 @@ export const BrutCalendar = () => {
   const navigateWeek = (direction: number) => {
     const newWeekStart = new Date(currentWeekStart)
     newWeekStart.setDate(currentWeekStart.getDate() + direction * 7)
-    setCurrentWeekStart(newWeekStart)
+
+    if (getPrevWeekStart().getTime() >= newWeekStart.getTime()) {
+      setIsAbleToShowPrevWeek(false);
+    } else {
+      setIsAbleToShowPrevWeek(true);
+    }
+
+    setCurrentWeekStart(newWeekStart);
   }
 
   const getCurrentDuration = () => {
@@ -135,6 +150,7 @@ export const BrutCalendar = () => {
         }}
       />
       <BrutCalendarWeekNav
+        isPrevDisabled={!isAbleToShowPrevWeek}
         onNavigateWeek={(val) => navigateWeek(val)}
         weekDates={weekDates}
       />
