@@ -7,7 +7,7 @@ import {UserRole} from "@prisma/client";
 import {redirect} from "next/navigation";
 import {getMaster} from "@/actions/master-actions";
 import {
-  createManyScheduleSlots, createScheduleSlot,
+  createScheduleSlot,
   deleteScheduleSlot,
   getMasterSchedule,
   updateScheduleSlotStatus
@@ -39,7 +39,6 @@ const CabinetSchedulePage = async () => {
       <BrutCalendar
         slots={slots}
         onCreateSlot={createScheduleSlot}
-        onSaveSchedule={createManyScheduleSlots}
         onUpdateSlot={updateScheduleSlotStatus}
         onDeleteSlot={deleteScheduleSlot}
       />

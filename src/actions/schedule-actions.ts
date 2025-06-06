@@ -18,7 +18,7 @@ const SlotSchema = z.object({
 
 const ManySlotsSchema = z.array(SlotSchema).nonempty('At least one slot is required');
 
-export async function getMasterSchedule(startDate?: string, endDate?: string) {
+export async function getMasterSchedule() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) throw new Error('Unauthorized');
   const user = await prisma.user.findUnique({
@@ -34,16 +34,8 @@ export async function getMasterSchedule(startDate?: string, endDate?: string) {
   });
   if (!master) throw new Error('Master not found');
 
-  const whereClause: any = {masterId: master.id};
-  if (startDate && endDate) {
-    whereClause.startTime = {
-      gte: new Date(startDate),
-      lte: new Date(endDate),
-    }
-  }
-
   const schedules = await prisma.schedule.findMany({
-    where: whereClause,
+    where: {masterId: master.id},
     orderBy: {startTime: 'asc'},
     include: {booking: true}
   });

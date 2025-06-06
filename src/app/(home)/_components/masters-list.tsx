@@ -7,7 +7,7 @@ interface MastersListProps {
 
 export const MastersList = ({masters}: MastersListProps) => {
   return (
-    <div>
+    <div className="space-y-4">
       {masters.map((master) => (
         <MastersListItem
           key={master.id}

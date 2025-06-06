@@ -27,7 +27,8 @@ export async function getPublicMasters(): Promise<PublicMasterInfo[]> {
     include: {
       user: {
         include: {contact: true}
-      }
+      },
+      schedules: true
     }
   });
 
@@ -38,7 +39,8 @@ export async function getPublicMasters(): Promise<PublicMasterInfo[]> {
     profession: master.profession || '',
     bio: master.bio || '',
     user: master.user,
-    contact: master.user.contact
+    contact: master.user.contact,
+    schedules: master.schedules
   }));
 }
 
@@ -48,7 +50,8 @@ export async function getMasterById(id: string): Promise<PublicMasterInfo> {
     include: {
       user: {
         include: {contact: true}
-      }
+      },
+      schedules: true,
     }
   });
 
@@ -59,7 +62,8 @@ export async function getMasterById(id: string): Promise<PublicMasterInfo> {
     profession: master.profession || '',
     bio: master.bio || '',
     user: master.user,
-    contact: master.user.contact
+    contact: master.user.contact,
+    schedules: master.schedules,
   }
 }
 

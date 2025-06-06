@@ -10,7 +10,6 @@ interface BrutCalendarSummaryProps extends ComponentPropsWithoutRef<'div'> {
   toggleSlotStatus: (slotId: string) => void;
   setSelectedSlots: (slots: TimeSlot[]) => void;
   onRemoveSlot: (slotId: string) => void;
-  onSaveSchedule: () => void;
 }
 
 export const BrutCalendarSummary = (
@@ -19,7 +18,6 @@ export const BrutCalendarSummary = (
     setSelectedSlots,
     toggleSlotStatus,
     onRemoveSlot,
-    onSaveSchedule,
     className,
     ...props
   }: BrutCalendarSummaryProps
@@ -49,17 +47,6 @@ export const BrutCalendarSummary = (
         {/*    <Icons.remove className="size-5 stroke-3" />*/}
         {/*    Clear all*/}
         {/*  </Button>*/}
-        {/*  <Button*/}
-        {/*    type='button'*/}
-        {/*    variant='outline'*/}
-        {/*    className="font-bold border-3"*/}
-        {/*    onClick={onSaveSchedule}*/}
-        {/*    size='sm'*/}
-        {/*  >*/}
-        {/*    <Icons.schedule className="size-5 stroke-3" />*/}
-        {/*    Save Schedule*/}
-        {/*  </Button>*/}
-        {/*</div>*/}
       </div>
       <div className="space-y-4">
         {sortedSlots.map((slotLine, index) => (

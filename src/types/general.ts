@@ -1,4 +1,4 @@
-import {Contact, User} from "@prisma/client";
+import {Contact, Schedule, User} from "@prisma/client";
 
 export interface PublicMasterInfo {
   id: string;
@@ -6,4 +6,5 @@ export interface PublicMasterInfo {
   bio: string;
   user: User;
   contact: Contact[];
+  schedules: Schedule[];
 }

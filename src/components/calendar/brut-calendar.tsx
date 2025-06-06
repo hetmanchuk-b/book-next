@@ -13,7 +13,6 @@ import {BrutCalendarSummary} from "@/components/calendar/brut-calendar-summary";
 
 interface BrutCalendarProps {
   slots: TimeSlot[];
-  onSaveSchedule: (slots: {startTime: string; endTime: string}[]) => Promise<{ success: boolean; scheduleId: string }[]>;
   onCreateSlot: (slotData: { startTime: string; endTime: string }) => Promise<{ success: boolean; scheduleId: string }>;
   onUpdateSlot: (id: string, slot: {startTime: string; endTime: string, status: ScheduleStatus}) => Promise<{ success: boolean; scheduleId: string }>;
   onDeleteSlot: (id: string) => Promise<{ success: boolean }>;
@@ -22,7 +21,6 @@ interface BrutCalendarProps {
 export const BrutCalendar = (
   {
     slots,
-    onSaveSchedule,
     onCreateSlot,
     onUpdateSlot,
     onDeleteSlot
@@ -165,23 +163,6 @@ export const BrutCalendar = (
     }
   }
 
-  const saveSchedule = async () => {
-    try {
-      const slotsToSave = selectedSlots.map((slot) => ({
-        startTime: slot.startDate.toISOString(),
-        endTime: slot.endDate.toISOString()
-      }));
-      const results = await onSaveSchedule(slotsToSave);
-      setSelectedSlots((prev) => prev.map((slot, index) => ({
-        ...slot,
-        id: results[index]?.scheduleId || slot.id
-      })));
-      toast.success('Schedule saved successfully.');
-    } catch (err: any) {
-      toast.error(err.message || 'Failed to save schedule');
-    }
-  }
-
   const onRemoveSlot = async (slotId: string) => {
     try {
       await onDeleteSlot(slotId);
@@ -237,7 +218,6 @@ export const BrutCalendar = (
       </ScrollArea>
 
       <BrutCalendarSummary
-        onSaveSchedule={saveSchedule}
         onRemoveSlot={(slotId) => onRemoveSlot(slotId)}
         setSelectedSlots={(slots) => setSelectedSlots(slots)}
         toggleSlotStatus={(slotId) => toggleSlotStatus(slotId)}
