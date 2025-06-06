@@ -9,12 +9,28 @@ import {BrutCalendarHeader} from "@/components/calendar/brut-calendar-header";
 import {BrutCalendarDurationsControls} from "@/components/calendar/brut-calendar-durations-controls";
 import {BrutCalendarWeekNav} from "@/components/calendar/brut-calendar-week-nav";
 import {BrutCalendarGrid} from "@/components/calendar/brut-calendar-grid";
-import {BrunCalendarSummary} from "@/components/calendar/brun-calendar-summary";
+import {BrutCalendarSummary} from "@/components/calendar/brut-calendar-summary";
 
-export const BrutCalendar = () => {
+interface BrutCalendarProps {
+  slots: TimeSlot[];
+  onSaveSchedule: (slots: {startTime: string; endTime: string}[]) => Promise<{ success: boolean; scheduleId: string }[]>;
+  onCreateSlot: (slotData: { startTime: string; endTime: string }) => Promise<{ success: boolean; scheduleId: string }>;
+  onUpdateSlot: (id: string, slot: {startTime: string; endTime: string, status: ScheduleStatus}) => Promise<{ success: boolean; scheduleId: string }>;
+  onDeleteSlot: (id: string) => Promise<{ success: boolean }>;
+}
+
+export const BrutCalendar = (
+  {
+    slots,
+    onSaveSchedule,
+    onCreateSlot,
+    onUpdateSlot,
+    onDeleteSlot
+  }: BrutCalendarProps,
+) => {
   const [selectedInterval, setSelectedInterval] = useState(1);
   const [customDuration, setCustomDuration] = useState<number | ''>('');
-  const [selectedSlots, setSelectedSlots] = useState<TimeSlot[]>([]);
+  const [selectedSlots, setSelectedSlots] = useState<TimeSlot[]>(slots);
   const [isAbleToShowPrevWeek, setIsAbleToShowPrevWeek] = useState(false);
   const [currentWeekStart, setCurrentWeekStart] = useState(() => {
     const today = new Date();
@@ -77,19 +93,31 @@ export const BrutCalendar = () => {
     })
   }
 
-  const toggleSlotStatus = (slotId: string) => {
-    setSelectedSlots((prev) => prev.map((slot) => {
-      if (slot.id === slotId) {
-        return {
-          ...slot,
-          status: slot.status === ScheduleStatus.FREE ? ScheduleStatus.BOOKED : ScheduleStatus.FREE,
-        }
-      }
-      return slot
-    }));
+  const toggleSlotStatus = async (slotId: string) => {
+    const slot = selectedSlots.find((s) => s.id === slotId);
+    if (!slot) return;
+    const newStatus = slot.status === ScheduleStatus.FREE ? ScheduleStatus.BOOKED : ScheduleStatus.FREE;
+
+    try {
+      await onUpdateSlot(slotId, {
+        startTime: slot.startDate.toISOString(),
+        endTime: slot.endDate.toISOString(),
+        status: newStatus
+      })
+      setSelectedSlots((prev) =>
+        prev.map((s) =>
+          s.id === slotId
+            ? { ...s, status: newStatus}
+            : s
+        )
+      );
+      toast.success(`Slot status has been updated to ${newStatus}`);
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to update slot status')
+    }
   }
 
-  const handleTimeSlotClick = (dayIndex: number, hour: number) => {
+  const handleTimeSlotClick = async (dayIndex: number, hour: number) => {
     const startDate = new Date(weekDates[dayIndex])
     startDate.setHours(hour, 0, 0, 0)
 
@@ -104,14 +132,26 @@ export const BrutCalendar = () => {
 
     const slotId = `${startDate.toISOString()}-${endDate.toISOString()}`
 
-    // Check if slot already exists
-    const existingSlotIndex = selectedSlots.findIndex((slot) => slot.id === slotId)
+    // Check if slot inside selected slots
+    const overlappingIndex = selectedSlots.findIndex((slot) => {
+      return (startDate.getTime() > slot.startDate.getTime() && startDate.getTime() < slot.endDate.getTime())
+        || (endDate.getTime() > slot.startDate.getTime() && endDate.getTime() < slot.endDate.getTime())
+        || (slot.startDate.getTime() > startDate.getTime() && slot.endDate.getTime() <= endDate.getTime())
+        || (slot.startDate.getTime() === startDate.getTime())
+        || (slot.id === slotId)
+    });
 
-    if (existingSlotIndex >= 0) {
-      // Remove existing slot
-      setSelectedSlots(selectedSlots.filter((_, index) => index !== existingSlotIndex))
-    } else {
-      // Add new slot
+    if (overlappingIndex >= 0) {
+      toast.error('Slots cannot overlap');
+      return;
+    }
+
+    try {
+      await onCreateSlot({
+        startTime: startDate.toISOString(),
+        endTime: endDate.toISOString()
+      });
+
       const newSlot: TimeSlot = {
         id: slotId,
         startDate,
@@ -119,6 +159,36 @@ export const BrutCalendar = () => {
         status: ScheduleStatus.FREE
       }
       setSelectedSlots([...selectedSlots, newSlot])
+      toast.success('Slot added to your schedule successfully')
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to create slot');
+    }
+  }
+
+  const saveSchedule = async () => {
+    try {
+      const slotsToSave = selectedSlots.map((slot) => ({
+        startTime: slot.startDate.toISOString(),
+        endTime: slot.endDate.toISOString()
+      }));
+      const results = await onSaveSchedule(slotsToSave);
+      setSelectedSlots((prev) => prev.map((slot, index) => ({
+        ...slot,
+        id: results[index]?.scheduleId || slot.id
+      })));
+      toast.success('Schedule saved successfully.');
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to save schedule');
+    }
+  }
+
+  const onRemoveSlot = async (slotId: string) => {
+    try {
+      await onDeleteSlot(slotId);
+      setSelectedSlots(selectedSlots.filter((slot) => slot.id !== slotId));
+      toast.info('Slot has been removed');
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to remove slot');
     }
   }
 
@@ -157,6 +227,7 @@ export const BrutCalendar = () => {
 
       <ScrollArea className="w-full border-4 bg-neutral-100">
         <BrutCalendarGrid
+          selectedSlots={selectedSlots}
           getSlotColor={(day, hour) => getSlotColor(day, hour)}
           isSlotSelected={(day, hour) => isSlotSelected(day, hour)}
           onTimeSlotClick={(dayIndex, hour) => handleTimeSlotClick(dayIndex, hour)}
@@ -165,7 +236,9 @@ export const BrutCalendar = () => {
         <ScrollBar orientation='horizontal' />
       </ScrollArea>
 
-      <BrunCalendarSummary
+      <BrutCalendarSummary
+        onSaveSchedule={saveSchedule}
+        onRemoveSlot={(slotId) => onRemoveSlot(slotId)}
         setSelectedSlots={(slots) => setSelectedSlots(slots)}
         toggleSlotStatus={(slotId) => toggleSlotStatus(slotId)}
         selectedSlots={selectedSlots}
@@ -173,5 +246,3 @@ export const BrutCalendar = () => {
     </div>
   );
 }
-
-

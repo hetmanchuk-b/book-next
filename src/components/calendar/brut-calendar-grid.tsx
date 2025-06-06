@@ -1,12 +1,13 @@
 import {ComponentPropsWithoutRef} from "react";
 import {cn} from "@/lib/utils";
-import {DAYS, HOURS} from "@/lib/calendar-utils";
+import {DAYS, HOURS, TimeSlot} from "@/lib/calendar-utils";
 
 interface BrutCalendarGridProps extends ComponentPropsWithoutRef<'div'> {
   weekDates: Date[];
   onTimeSlotClick: (day: number, hour: number) => void;
   isSlotSelected: (day: number, hour: number) => boolean;
   getSlotColor: (day: number, hour: number) => string;
+  selectedSlots: TimeSlot[];
 }
 
 export const BrutCalendarGrid = (
@@ -15,6 +16,7 @@ export const BrutCalendarGrid = (
     getSlotColor,
     onTimeSlotClick,
     isSlotSelected,
+    selectedSlots,
     className,
     ...props
   }: BrutCalendarGridProps
@@ -31,6 +33,7 @@ export const BrutCalendarGrid = (
         weekDates={weekDates}
       />
       <BrutCalendarGridTimeSlots
+        selectedSlots={selectedSlots}
         getSlotColor={getSlotColor}
         isSlotSelected={isSlotSelected}
         weekDates={weekDates}
@@ -45,11 +48,13 @@ interface BrutCalendarGridTimeSlotsProps extends ComponentPropsWithoutRef<'div'>
   onTimeSlotClick: (day: number, hour: number) => void;
   isSlotSelected: (day: number, hour: number) => boolean;
   getSlotColor: (day: number, hour: number) => string;
+  selectedSlots: TimeSlot[];
 }
 
 const BrutCalendarGridTimeSlots = (
   {
     onTimeSlotClick,
+    selectedSlots,
     isSlotSelected,
     getSlotColor,
     weekDates,
@@ -75,7 +80,7 @@ const BrutCalendarGridTimeSlots = (
               key={dayIndex}
               onClick={() => onTimeSlotClick(dayIndex, hour)}
               className={cn(
-                'border-r-2 p-3 text-sm font-bold transition-colors last:border-r-0 bg-white hover:bg-neutral-200',
+                'cursor-pointer border-r-2 p-3 text-sm font-bold transition-colors last:border-r-0 bg-white hover:bg-neutral-200',
                 isSlotSelected(dayIndex, hour) && 'bg-emerald-500 text-white hover:bg-emerald-700',
                 getSlotColor(dayIndex, hour)
               )}

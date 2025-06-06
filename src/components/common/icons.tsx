@@ -14,6 +14,8 @@ import {
   Clock,
   Calendar,
   X,
+  ToggleLeft,
+  ToggleRight,
   type LucideIcon,
   type LucideProps,
 } from 'lucide-react';
@@ -36,6 +38,8 @@ export const Icons = {
   clock: Clock,
   calendar: Calendar,
   x: X,
+  toggleLeft: ToggleLeft,
+  toggleRight: ToggleRight,
   google: ({ ...props }: LucideProps) => (
     <svg
       aria-hidden="true"
