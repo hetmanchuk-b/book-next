@@ -6,6 +6,7 @@ import {authOptions} from "@/auth";
 import {UserRole} from "@prisma/client";
 import prisma from "@/lib/prisma";
 import {revalidatePath} from "next/cache";
+import {PublicMasterInfo} from "@/types/general";
 
 const MasterSchema = z.object({
   name: z.string().max(100).optional(),
@@ -20,6 +21,47 @@ const ContactSchema = z.array(
     value: z.string().min(1, {message: "Contact link is required"}).max(150),
   }),
 );
+
+export async function getPublicMasters(): Promise<PublicMasterInfo[]> {
+  const masters = await prisma.master.findMany({
+    include: {
+      user: {
+        include: {contact: true}
+      }
+    }
+  });
+
+  if (!masters.length) throw new Error('No masters found');
+
+  return masters.map((master) => ({
+    id: master.id,
+    profession: master.profession || '',
+    bio: master.bio || '',
+    user: master.user,
+    contact: master.user.contact
+  }));
+}
+
+export async function getMasterById(id: string): Promise<PublicMasterInfo> {
+  const master = await prisma.master.findUnique({
+    where: {id},
+    include: {
+      user: {
+        include: {contact: true}
+      }
+    }
+  });
+
+  if (!master) throw new Error('Master not found');
+
+  return {
+    id: master.id,
+    profession: master.profession || '',
+    bio: master.bio || '',
+    user: master.user,
+    contact: master.user.contact
+  }
+}
 
 export async function getMaster() {
   const session = await getServerSession(authOptions);

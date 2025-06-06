@@ -10,7 +10,7 @@ import {
   createManyScheduleSlots, createScheduleSlot,
   deleteScheduleSlot,
   getMasterSchedule,
-  updateScheduleSlot
+  updateScheduleSlotStatus
 } from "@/actions/schedule-actions";
 
 const CabinetSchedulePage = async () => {
@@ -40,7 +40,7 @@ const CabinetSchedulePage = async () => {
         slots={slots}
         onCreateSlot={createScheduleSlot}
         onSaveSchedule={createManyScheduleSlots}
-        onUpdateSlot={updateScheduleSlot}
+        onUpdateSlot={updateScheduleSlotStatus}
         onDeleteSlot={deleteScheduleSlot}
       />
     </div>

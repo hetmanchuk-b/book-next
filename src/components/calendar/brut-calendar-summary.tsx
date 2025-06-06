@@ -1,5 +1,5 @@
 import {ComponentPropsWithoutRef} from "react";
-import {cn} from "@/lib/utils";
+import {cn, groupTimeSlotsByDay} from "@/lib/utils";
 import {formatDate, formatTime, getDurationHours, TimeSlot} from "@/lib/calendar-utils";
 import {ScheduleStatus} from "@prisma/client";
 import {Icons} from "@/components/common/icons";
@@ -25,6 +25,8 @@ export const BrutCalendarSummary = (
   }: BrutCalendarSummaryProps
 ) => {
   if (!selectedSlots.length) return null;
+
+  const sortedSlots = groupTimeSlotsByDay(selectedSlots);
 
   return (
     <div
@@ -59,14 +61,21 @@ export const BrutCalendarSummary = (
         {/*  </Button>*/}
         {/*</div>*/}
       </div>
-      <div className="grid gap-3 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-        {selectedSlots.sort((a, b) => a.startDate.getTime() - b.startDate.getTime()).map((slot) => (
-          <BrutCalendarSummaryCard
-            key={slot.id}
-            toggleSlotStatus={toggleSlotStatus}
-            onRemoveSlot={onRemoveSlot}
-            timeSlot={slot}
-          />
+      <div className="space-y-4">
+        {sortedSlots.map((slotLine, index) => (
+          <div>
+            <p className="text-sm font-bold">{formatDate(slotLine[0].startDate)}</p>
+            <div className="grid gap-3 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+              {slotLine.map((slot) => (
+                <BrutCalendarSummaryCard
+                  key={slot.id}
+                  toggleSlotStatus={toggleSlotStatus}
+                  onRemoveSlot={onRemoveSlot}
+                  timeSlot={slot}
+                />
+              ))}
+            </div>
+          </div>
         ))}
       </div>
     </div>
@@ -114,7 +123,7 @@ export const BrutCalendarSummaryCard = (
           <Button
             type="button"
             size='sm'
-            className="font-bold border-0 text-sm group"
+            className="font-bold border-0 text-sm w-full"
             onClick={(e) => {
               e.preventDefault();
               toggleSlotStatus(timeSlot.id)
@@ -123,17 +132,17 @@ export const BrutCalendarSummaryCard = (
             {timeSlot.status === ScheduleStatus.FREE
               ? <Icons.toggleLeft className="size-5 stroke-3"/>
               : <Icons.toggleRight className="size-5 stroke-3"/>}
-            <span className="hidden group-hover:block">Change Status</span>
+            Change Status
           </Button>
           <Button
             type="button"
             size='sm'
             onClick={() => onRemoveSlot(timeSlot.id)}
-            className="font-bold border-0 text-sm group"
+            className="font-bold border-0 text-sm w-full"
             variant='destructive'
           >
             <Icons.remove className="size-5 stroke-3" />
-            <span className="hidden group-hover:block">Remove Slot</span>
+            Remove Slot
           </Button>
         </div>
       </div>

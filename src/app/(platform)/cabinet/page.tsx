@@ -1,12 +1,15 @@
 import {getServerSession} from "next-auth";
 import {authOptions} from "@/auth";
 import {getUser} from "@/actions/user-actions";
-import {UserRole} from "@prisma/client";
+import {Contact, Master, Schedule, User, UserRole} from "@prisma/client";
 import {redirect} from "next/navigation";
 import {getMaster} from "@/actions/master-actions";
 import Link from "next/link";
 import {cn} from "@/lib/utils";
 import {buttonVariants} from "@/components/ui/button";
+import {GeneralInfo} from "@/app/(platform)/cabinet/_components/general-info";
+import {getMasterSchedule} from "@/actions/schedule-actions";
+import {ScheduleInfo} from "@/app/(platform)/cabinet/_components/schedule-info";
 
 const CabinetPage = async () => {
   const session = await getServerSession(authOptions);
@@ -17,8 +20,9 @@ const CabinetPage = async () => {
   if (!user || user.role !== UserRole.MASTER) redirect("/");
 
   const master = await getMaster();
-
   if (!master) redirect("/");
+
+  const masterSchedule = await getMasterSchedule();
 
   return (
     <div className="container mx-auto py-4 space-y-4">
@@ -31,47 +35,26 @@ const CabinetPage = async () => {
           Edit Info
         </Link>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
-        <div className="space-y-3">
-          <div className="space-y-1 bg-white p-2 rounded-sm border">
-            <p className="font-medium text-sm text-gray-700">Name</p>
-            <p className="text-base font-bold">{user.name}</p>
-          </div>
-          <div className="space-y-1 bg-white p-2 rounded-sm border">
-            <p className="font-medium text-sm text-gray-700">Profession</p>
-            {master.profession ? (
-              <p className="text-base font-bold">{master.profession}</p>
-            ) : (
-              <p className="text-base text-gray-700 font-medium">No profession.</p>
-            )}
-          </div>
-          <div className="space-y-1 bg-white p-2 rounded-sm border">
-            <p className="font-medium text-sm text-gray-700">Bio</p>
-            {master.bio ? (
-              <p className="text-base font-bold">{master.bio}</p>
-            ) : (
-              <p className="text-base text-gray-700 font-medium">No bio.</p>
-            )}
-          </div>
-        </div>
-        <div className="space-y-3 bg-white p-2 rounded-sm border">
-          <p className="text-md font-semibold">Contacts list</p>
-          {user.contact.length ? user.contact.map((contact) => (
-            <div key={contact.id} className="bg-neutral-100 p-2 rounded-sm border">
-              <p className="font-medium text-sm text-gray-700">{contact.name}</p>
-              <p className="text-base font-bold">{contact.value}</p>
-            </div>
-          )) : (
-            <p className="text-base text-gray-700 font-medium">No contacts.</p>
-          )}
-        </div>
-      </div>
+      <GeneralInfo
+        user={user as User & {
+          master: Master;
+          contact: Contact[];
+        }}
+        master={master as {
+          profession: string;
+          bio: string;
+          user: User;
+        }}
+      />
       <div className="flex flex-col items-center lg:flex-row lg:justify-between gap-4">
         <h2 className="mb-4 text-start text-2xl font-semibold">Schedule Info</h2>
         <Link href='/cabinet/schedule' className={cn(buttonVariants({variant: 'link'}))}>
           Edit Schedule
         </Link>
       </div>
+
+      <ScheduleInfo schedule={masterSchedule as Schedule[]} />
+
     </div>
   );
 };

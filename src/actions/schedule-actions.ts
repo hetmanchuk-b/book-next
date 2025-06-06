@@ -171,7 +171,7 @@ export async function createScheduleSlot(slotData: {startTime: string, endTime: 
   return {success: true, scheduleId: schedule.id};
 }
 
-export async function updateScheduleSlot(
+export async function updateScheduleSlotStatus(
   id: string,
   slotData: {
     startTime: string;

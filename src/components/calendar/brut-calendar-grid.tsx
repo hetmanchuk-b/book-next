@@ -62,10 +62,17 @@ const BrutCalendarGridTimeSlots = (
     ...props
   }: BrutCalendarGridTimeSlotsProps
 ) => {
+
+  const isSlotInThePast = (hour: number, dayIndex: number) => {
+    const startDate = new Date(weekDates[dayIndex])
+    startDate.setHours(hour, 0, 0, 0)
+    return startDate.getTime() < new Date().getTime()
+  }
+
   return (
     <div
       className={cn(
-        'max-h-124 w-full',
+        'max-h-[70vh] min-h-100 w-full',
         className
       )}
       {...props}
@@ -80,11 +87,12 @@ const BrutCalendarGridTimeSlots = (
               key={dayIndex}
               onClick={() => onTimeSlotClick(dayIndex, hour)}
               className={cn(
-                'cursor-pointer border-r-2 p-3 text-sm font-bold transition-colors last:border-r-0 bg-white hover:bg-neutral-200',
+                'cursor-pointer relative border-r-2 p-3 text-sm font-bold transition-colors last:border-r-0 bg-white hover:bg-neutral-200',
                 isSlotSelected(dayIndex, hour) && 'bg-emerald-500 text-white hover:bg-emerald-700',
                 getSlotColor(dayIndex, hour)
               )}
             >
+              {isSlotInThePast(hour, dayIndex) && <span className="absolute inset-1 bg-neutral-950/40"></span>}
               {isSlotSelected(dayIndex, hour) ? (
                 <span>{hour.toString().padStart(2, '0')}:00</span>
               ) : null}
