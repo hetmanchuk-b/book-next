@@ -119,7 +119,7 @@ export const BrutCalendar = (
     const startDate = new Date(weekDates[dayIndex])
     startDate.setHours(hour, 0, 0, 0)
 
-    if (startDate.getTime() < Date.now()) {
+    if (startDate.getTime() < new Date().getTime()) {
       toast.error('Date cannot be in the past');
       return
     }
@@ -128,15 +128,12 @@ export const BrutCalendar = (
     const endDate = new Date(startDate)
     endDate.setTime(startDate.getTime() + duration * 60 * 60 * 1000)
 
-    const slotId = `${startDate.toISOString()}-${endDate.toISOString()}`
-
     // Check if slot inside selected slots
     const overlappingIndex = selectedSlots.findIndex((slot) => {
       return (startDate.getTime() > slot.startDate.getTime() && startDate.getTime() < slot.endDate.getTime())
         || (endDate.getTime() > slot.startDate.getTime() && endDate.getTime() < slot.endDate.getTime())
         || (slot.startDate.getTime() > startDate.getTime() && slot.endDate.getTime() <= endDate.getTime())
         || (slot.startDate.getTime() === startDate.getTime())
-        || (slot.id === slotId)
     });
 
     if (overlappingIndex >= 0) {
@@ -145,13 +142,13 @@ export const BrutCalendar = (
     }
 
     try {
-      await onCreateSlot({
+      const res = await onCreateSlot({
         startTime: startDate.toISOString(),
         endTime: endDate.toISOString()
       });
 
       const newSlot: TimeSlot = {
-        id: slotId,
+        id: res.scheduleId,
         startDate,
         endDate,
         status: ScheduleStatus.FREE

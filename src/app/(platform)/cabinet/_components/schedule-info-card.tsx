@@ -32,7 +32,7 @@ export const ScheduleInfoCard = ({scheduleItem}: ScheduleInfoCardProps) => {
         <div className="flex items-center gap-2">
           <Icons.clock className="size-4"/>
           <div className="text-sm font-black">
-            {formatTime(scheduleItem.startTime)} - {formatTime(scheduleItem.endTime)}
+            {/*{`${formatTime(scheduleItem.startTime)} - ${formatTime(scheduleItem.endTime)}`}*/}
           </div>
         </div>
       </div>

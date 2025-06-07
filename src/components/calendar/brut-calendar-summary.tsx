@@ -50,7 +50,7 @@ export const BrutCalendarSummary = (
       </div>
       <div className="space-y-4">
         {sortedSlots.map((slotLine, index) => (
-          <div>
+          <div key={index}>
             <p className="text-sm font-bold">{formatDate(slotLine[0].startDate)}</p>
             <div className="grid gap-3 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
               {slotLine.map((slot) => (
